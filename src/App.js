@@ -1,45 +1,44 @@
 import React, { Component } from 'react';
+import { ApolloProvider } from 'react-apollo';
 import logo from './logo.svg';
 import './App.css';
 
-class LambdaDemo extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {loading: false, msg: null};
-  }
+import client from './apollo';
 
-  handleClick = (e) => {
-    e.preventDefault();
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
 
-    this.setState({loading: true});
-    fetch('/.netlify/functions/hello')
-      .then(response => response.json())
-      .then(json => this.setState({loading: false, msg: json.msg}));
-  }
+const Books = () => (
+  <Query
+    query={gql`
+      {
+        books {
+          title
+        }
+      }
+    `}
+  >
+    {({ loading, error, data }) => {
+      if (loading) return <p>Loading...</p>;
+      if (error) return <p>Error :(</p>;
 
-  render() {
-    const {loading, msg} = this.state;
-
-    return <p>
-      <button onClick={this.handleClick}>{loading ? 'Loading...' : 'Call Lambda'}</button><br/>
-      <span>{msg}</span>
-    </p>
-  }
-}
+      return data.books.map(({ title }) => (
+        <div key={title}>
+          <p>{`${title}`}</p>
+        </div>
+      ));
+    }}
+  </Query>
+);
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-        <LambdaDemo/>
-      </div>
+      <ApolloProvider client={client}>
+        <div className="App">
+          <Books />
+        </div>
+      </ApolloProvider>
     );
   }
 }
