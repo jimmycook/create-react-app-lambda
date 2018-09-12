@@ -14,6 +14,7 @@ const Books = () => (
       {
         books {
           title
+          author
         }
       }
     `}
@@ -22,9 +23,9 @@ const Books = () => (
       if (loading) return <p>Loading...</p>;
       if (error) return <p>Error :(</p>;
 
-      return data.books.map(({ title }) => (
+      return data.books.map(({ title, author }) => (
         <div key={title}>
-          <p>{`${title}`}</p>
+          <p>{`${title} by ${author}`}</p>
         </div>
       ));
     }}
